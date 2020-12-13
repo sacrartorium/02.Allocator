@@ -1,0 +1,18 @@
+language: cpp
+env:
+  global:
+    - NAMEP=allocator-$TRAVIS_BUILD_NUMBER-Linux.deb
+before_script:
+- echo "deb http://archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
+- sudo apt-get update -qq
+script:
+- cmake .
+- cmake --build .
+- cmake --build . --target package
+deploy:
+  provider: script
+  skip_cleanup: true
+  on:
+    branch: main
+  script:
+  - curl -v -T $NAMEP -usacrartorium:$BINTRAY_API_KEY "https://api.bintray.com/content/sacrartorium/otus/02/$TRAVIS_BUILD_NUMBER/$NAMEP;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
